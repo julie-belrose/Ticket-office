@@ -38,32 +38,47 @@ public final class Main {
      * @param args CLI arguments (unused)
      */
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
+        try (Scanner in = new Scanner(System.in)) {
+            Repos repos = initRepositories();
+            TicketService svc = new TicketService(repos.eventRepo(), repos.clientRepo());
 
-        Repository<Client> clientRepo = new MapRepository<>(Client::getId);
-        Repository<Event> eventRepo = new MapRepository<>(Event::getId);
-        TicketService ticketSvc = new TicketService(eventRepo, clientRepo);
+            SampleIds ids = preloadData(repos.clientRepo(), repos.eventRepo(), svc);
+            demoScript(svc, ids);
 
-        SampleIds ids = preloadData(clientRepo, eventRepo, ticketSvc);
+            Ihm<Client> clientIhm = buildClientIhm(repos.clientRepo(), in);
+            Ihm<Event>  eventIhm  = buildEventIhm (repos.eventRepo(),  in);
 
-        demoScript(ticketSvc, ids);
+            new MainMenu(clientIhm, eventIhm, svc, in).start();
+        }
+    }
 
-        Ihm<Client> clientIhm = new Ihm<>(
-                "CLIENTS", clientRepo,
+    private record Repos(Repository<Client> clientRepo,
+                         Repository<Event>  eventRepo) { }
+
+    private static Repos initRepositories() {
+        return new Repos(
+                new MapRepository<>(Client::getId),
+                new MapRepository<>(Event::getId)
+        );
+    }
+
+    private static Ihm<Client> buildClientIhm(Repository<Client> repo, Scanner in) {
+        return new Ihm<>(
+                "CLIENTS", repo,
                 () -> ClientPrompter.create(in),
                 ClientPrompter::update,
                 in
         );
+    }
 
-        Ihm<Event> eventIhm = new Ihm<>(
-                "EVENTS", eventRepo,
+    private static Ihm<Event> buildEventIhm(Repository<Event> repo, Scanner in) {
+        return new Ihm<>(
+                "EVENTS", repo,
                 () -> EventPrompter.create(in),
                 EventPrompter::update,
                 in
         );
-
-        new MainMenu(clientIhm, eventIhm, ticketSvc, in).start();
-}
+    }
 
     /**
      * Small DTO to track IDs used during seeding.
@@ -85,7 +100,7 @@ public final class Main {
                     Repository<Event> eventRepo,
                     TicketService ticketSvc) {
 
-            String clientId = generateId();
+        String clientId = generateId();
         String eventId = generateId();
 
         preloadDataClient(clientId, clientRepo);
