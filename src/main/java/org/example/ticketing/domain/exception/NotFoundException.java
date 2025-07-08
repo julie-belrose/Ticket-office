@@ -10,13 +10,11 @@ public class NotFoundException extends CrudException {
 
     private final String fullMessage;
 
-    // Constructor without details
     public NotFoundException() {
         super(BASE_MSG);
         this.fullMessage = BASE_MSG + ".";
     }
 
-    // Constructor with element context (type + id)
     public NotFoundException(String elementRef) {
         super(BASE_MSG);
         this.fullMessage = BASE_MSG + ": " + elementRef + ".";

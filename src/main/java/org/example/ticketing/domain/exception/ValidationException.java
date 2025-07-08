@@ -5,13 +5,11 @@ public class ValidationException extends CrudException {
 
     private final String fullMessage;
 
-    // ─── Constructor without hint ───────────────────
     public ValidationException(String field) {
         super(BASE_MSG);
         this.fullMessage = "Field '" + field + "' is not valid.";
     }
 
-    // ─── Constructor with hint ──────────────────────
     public ValidationException(String field, String hint) {
         super(BASE_MSG);
         this.fullMessage = "Field '" + field + "' is not valid. " + hint;

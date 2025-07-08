@@ -9,15 +9,13 @@ public class CapacityFullException extends CrudException {
 
     private static final String BASE_MSG = "Event capacity reached";
 
-    private final String fullMessage;   // final user-facing message
+    private final String fullMessage;
 
-    // Constructor without context
     public CapacityFullException() {
         super(BASE_MSG);
         this.fullMessage = BASE_MSG + ".";
     }
 
-    // Constructor with event context (id or name)
     public CapacityFullException(String eventRef) {
         super(BASE_MSG);
         this.fullMessage = BASE_MSG + " for event '" + eventRef + "'.";
