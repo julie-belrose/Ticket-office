@@ -1,6 +1,5 @@
 package org.example;
 
-
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.Date;
@@ -29,9 +28,7 @@ import org.example.ticketing.ui.ClientPrompter;
  */
 public final class Main {
 
-        /**
-         * Prevent instantiation.
-         */
+        /** Prevent instantiation. */
         private Main() {
         }
 
@@ -41,19 +38,15 @@ public final class Main {
      * @param args CLI arguments (unused)
      */
     public static void main(String[] args) {
-
         Scanner in = new Scanner(System.in);
 
         Repository<Client> clientRepo = new MapRepository<>(Client::getId);
         Repository<Event> eventRepo = new MapRepository<>(Event::getId);
-
         TicketService ticketSvc = new TicketService(eventRepo, clientRepo);
 
-        /* Seed demo data and keep back the generated IDs */
         SampleIds ids = preloadData(clientRepo, eventRepo, ticketSvc);
 
-        /* Optional demo reservation with random IDs */
-        demoScenario(ticketSvc, ids);
+        demoScript(ticketSvc, ids);
 
         Ihm<Client> clientIhm = new Ihm<>(
                 "CLIENTS", clientRepo,
@@ -72,19 +65,28 @@ public final class Main {
         new MainMenu(clientIhm, eventIhm, ticketSvc, in).start();
 }
 
-/* ---------- PRELOAD ----------------------------------------------- */
+    /**
+     * Small DTO to track IDs used during seeding.
+     * These IDs can be reused in other demo steps.
+     */
+    private record SampleIds(String clientId, String eventId) {
+    }
 
-/** Holder for the random IDs we want to reuse in the demo. */
-private record SampleIds(String clientId, String eventId) {
-}
+    /**
+     * Seeds a default client, event and initial reservation for testing purposes.
+     *
+     * @param clientRepo the repository where to save the sample client
+     * @param eventRepo  the repository where to save the sample event
+     * @param ticketSvc  service used to simulate a booking
+     * @return the IDs of the created client and event
+     */
+    private static SampleIds preloadData(
+                    Repository<Client> clientRepo,
+                    Repository<Event> eventRepo,
+                    TicketService ticketSvc) {
 
-private static SampleIds preloadData(Repository<Client> clientRepo,
-                Repository<Event> eventRepo, TicketService ticketSvc) {
-
-        String clientId = generateId();
-        String clientId2 = generateId();
+            String clientId = generateId();
         String eventId = generateId();
-        String eventId2 = generateId();
 
         preloadDataClient(clientId, clientRepo);
         preloadDataEvent(eventId, eventRepo);
@@ -93,24 +95,47 @@ private static SampleIds preloadData(Repository<Client> clientRepo,
         return new SampleIds(clientId, eventId);
 }
 
-/** Generates a unique ID (UUID string). */
-private static String generateId() {
+    /**
+     * Generates a new unique ID using {@link UUID}.
+     *
+     * @return a random UUID as a string
+     */
+    private static String generateId() {
         return UUID.randomUUID().toString();
 }
 
-private static void preloadDataEvent(String eventId, Repository<Event> eventRepo) {
+/**
+ * Creates and saves a sample event in the given repository.
+ *
+ * @param eventId   the ID to assign to the event
+ * @param eventRepo the target event repository
+ */
+    private static void preloadDataEvent(String eventId, Repository<Event> eventRepo) {
         Location location = new Location("Opéra Garnier", "Paris", 3);
         Event event = new Event(eventId, "Concert Piano", location, new Date(), "21:00", 3);
         eventRepo.save(event);
 }
 
-private static void preloadDataClient(String clientId, Repository<Client> clientRepo) {
+/**
+ * Creates and saves a sample client in the given repository.
+ *
+ * @param clientId   the ID to assign to the client
+ * @param clientRepo the target client repository
+ */
+    private static void preloadDataClient(String clientId, Repository<Client> clientRepo) {
         Address address = new Address("7 rue du Paradis", "Paris");
         Client client = new Client(clientId, "Julie", "Belrose", address, 29, "+33600000001");
         clientRepo.save(client);
 }
 
-private static void preloadDataTicket(TicketService ticketSvc, String clientId, String eventId) {
+/**
+ * Simulates a successful ticket booking using the given service.
+ *
+ * @param ticketSvc the service to process the booking
+ * @param clientId  the ID of the client booking
+ * @param eventId   the ID of the event
+ */
+    private static void preloadDataTicket(TicketService ticketSvc, String clientId, String eventId) {
         try {
                 Ticket ticket = ticketSvc.reserve(clientId, eventId, 1, SeatType.GOLD);
                 System.out.println("[DATA] Ticket booked : " + ticket);
@@ -119,7 +144,13 @@ private static void preloadDataTicket(TicketService ticketSvc, String clientId, 
         }
 }
 
-private static void demoScenario(TicketService svc, SampleIds ids) {
+/**
+ * Simulates a second ticket booking for demo purposes.
+ *
+ * @param svc the ticket service
+ * @param ids previously generated client/event IDs
+ */
+private static void demoScript(TicketService svc, SampleIds ids) {
         try {
                 Ticket t = svc.reserve(ids.clientId, ids.eventId, 1, SeatType.VIP);
                 System.out.println("[DEMO] Booked: " + t);
@@ -127,5 +158,4 @@ private static void demoScenario(TicketService svc, SampleIds ids) {
                 System.out.println("[DEMO] " + ex.getMessage());
         }
 }
-
 }
