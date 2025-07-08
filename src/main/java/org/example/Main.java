@@ -1,17 +1,41 @@
 package org.example;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+
+import org.example.ticketing.domain.Client;
+import org.example.ticketing.repository.MapRepository;
+import org.example.ticketing.repository.Repository;
+import org.example.ticketing.service.TicketService;
+import org.example.ticketing.ui.Ihm;
+import org.example.ticketing.domain.Event;
+import org.example.ticketing.ui.MainMenu;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+        // ─── REPOSITORIES ─────────────────────────
+        Repository<Client> clientRepo =
+                new MapRepository<>(Client::getId);
+        Repository<Event> eventRepo =
+                new MapRepository<>(Event::getId);
+
+        // ─── GENERIC IHMs (lambdas) ───────────────
+        Ihm<Client> clientIhm = new Ihm<>(
+                clientRepo,
+                () -> { /* ask Scanner questions, build Client */ },
+                (c, sc) -> { /* update Client fields */ }
+        );
+
+        Ihm<Event> eventIhm = new Ihm<>(
+                eventRepo,
+                () -> { /* build Event */ },
+                (e, sc) -> { /* update Event */ }
+        );
+
+        // ─── SERVICE ─────────────────────────────
+        TicketService ticketService = new TicketService(eventRepo, clientRepo);
+
+        // ─── MENU ────────────────────────────────
+        MainMenu menu = new MainMenu(clientIhm, eventIhm, ticketService);
+        menu.start();
     }
 }
