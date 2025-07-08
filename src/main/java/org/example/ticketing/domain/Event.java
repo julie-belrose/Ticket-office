@@ -1,30 +1,93 @@
 package org.example.ticketing.domain;
 
 import java.util.List;
+
+import org.example.ticketing.domain.exception.CapacityFullException;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 public class Event {
-    // ─── FIELDS ──────────────────────
-    private String id;                  // UUID
-    private String name;
-    private Location location;          // has capacity
-    private Date date;
-    private String time;                // optional: replace with LocalTime
-    private int totalSeats;
-    private List<Ticket> tickets;
+    private final String id;
+    private final String name;
+    private final Location location;
+    private final Date date;
+    private String time;
+    private final int totalSeats;
+    private final List<Ticket> tickets;
 
-    // ─── CONSTRUCTOR ─────────────────
-    // Parameters: id, name, location, date, time, totalSeats
-    // Validate: totalSeats > 0
-    // Initialize empty ticket list
+    public Event(String id, String name, Location location, Date date, String time, int totalSeats) {
+        validateNotNull(id, "id");
+        validateNotNull(name, "name");
+        validateNotNull(location, "location");
+        validateNotNull(date, "date");
+        validateNotNull(time, "time");
+        validateTotalSeats(totalSeats);
+        this.id = id;
+        this.name = name;
+        this.location = location;
+        this.date = date;
+        this.time = time;
+        this.totalSeats = totalSeats;
+        this.tickets = new ArrayList<>();
+    }
 
-    // ─── GETTERS AND SETTERS ─────────
+    private void validateNotNull(Object obj, String field) {
+        if (obj == null)
+            throw new IllegalArgumentException(field + " must not be null");
+    }
 
-    // ─── BUSINESS METHODS ────────────
-    // boolean hasAvailableSeats()
-    // void addTicket(Ticket ticket)
-    //   - If no seats available → throw CapacityFullException
+    private void validateTotalSeats(int totalSeats) {
+        if (totalSeats <= 0)
+            throw new IllegalArgumentException("Total seats must be > 0");
+    }
 
-    // ─── toString() ──────────────────
-    // Example: [e45] Jazz Night @Paris on 2025-08-01 20:00 (12/50 seats)
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public int getTotalSeats() {
+        return totalSeats;
+    }
+
+    public List<Ticket> getTickets() {
+        return Collections.unmodifiableList(tickets);
+    }
+
+    public boolean hasAvailableSeats() {
+        return tickets.size() < totalSeats;
+    }
+
+    public void addTicket(Ticket ticket) {
+        if (!hasAvailableSeats()) {
+            throw new CapacityFullException("Event " + id + " is full");
+        }
+        if (!this.equals(ticket.getEvent())) {
+            throw new IllegalArgumentException("Ticket does not belong to this event");
+        }
+        tickets.add(ticket);
+    }
+
+    @Override
+    public String toString() {
+        return "[" + id + "] " + name + " @" + location + " on " + date + " " + time + " (" + tickets.size() + "/"
+                + totalSeats + " seats)";
+    }
 }

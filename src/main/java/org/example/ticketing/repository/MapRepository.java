@@ -9,11 +9,9 @@ import java.util.function.Function;
 
 public class MapRepository<T> implements Repository<T> {
 
-    // ─── FIELDS ────────────────────────────────────────────
     private final Map<String, T> store = new HashMap<>();
-    private final Function<T, String> idExtractor;   // ex. Client::getId
+    private final Function<T, String> idExtractor;
 
-    // ─── CONSTRUCTOR ──────────────────────────────────────
     public MapRepository(Function<T, String> idExtractor) {
         this.idExtractor = idExtractor;
     }

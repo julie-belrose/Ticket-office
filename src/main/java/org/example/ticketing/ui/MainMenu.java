@@ -1,8 +1,8 @@
 package org.example.ticketing.ui;
 
-import com.example.ticketing.domain.*;
-import com.example.ticketing.repository.*;
-import com.example.ticketing.service.*;
+import org.example.ticketing.domain.*;
+import org.example.ticketing.repository.*;
+import org.example.ticketing.service.*;
 import java.util.Scanner;
 
 /** Root menu that wires sub-IHMs and the booking flow. */

@@ -1,16 +1,30 @@
 package org.example.ticketing.domain;
 
 public class Location extends Address {
-    // ─── EXTRA FIELD ─────────────────
     private int capacity;
 
-    // ─── CONSTRUCTOR ─────────────────
-    // Parameters: street, city, capacity
-    // Call super(street, city)
-    // Validate: capacity > 0
+    public Location(String street, String city, int capacity) {
+        super(street, city);
+        validateCapacity(capacity);
+        this.capacity = capacity;
+    }
 
-    // ─── GETTER AND SETTER ───────────
+    private void validateCapacity(int capacity) {
+        if (capacity <= 0)
+            throw new IllegalArgumentException("Capacity must be > 0");
+    }
 
-    // ─── toString() ──────────────────
-    // Format: "street, city – capacity seats"
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        validateCapacity(capacity);
+        this.capacity = capacity;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " – " + capacity + " seats";
+    }
 }
