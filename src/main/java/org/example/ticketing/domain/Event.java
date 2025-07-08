@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class Event {
     private final String id;
-    private final String name;
+    private String name;
     private final Location location;
     private final Date date;
     private String time;
@@ -69,6 +69,11 @@ public class Event {
 
     public List<Ticket> getTickets() {
         return Collections.unmodifiableList(tickets);
+    }
+
+    public void setName(String name) {
+        validateNotNull(name, "name");
+        this.name = name;
     }
 
     public boolean hasAvailableSeats() {
