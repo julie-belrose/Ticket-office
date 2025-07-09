@@ -1,5 +1,9 @@
 package org.example.ticketing.repository;
 
+import org.example.ticketing.domain.exception.DeleteException;
+import org.example.ticketing.domain.exception.NotFoundException;
+import org.example.ticketing.domain.exception.SaveException;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -16,16 +20,20 @@ public class MapRepository<T> implements Repository<T> {
         this.idExtractor = idExtractor;
     }
 
-    // ─── CRUD METHODS ─────────────────────────────────────
     @Override
     public void save(T obj) {
-        String id = idExtractor.apply(obj);
-        store.put(id, obj);
+        try {
+            store.put(idExtractor.apply(obj), obj);
+        } catch (Exception e) {
+            throw new SaveException(e.getMessage());
+        }
     }
 
     @Override
     public Optional<T> find(String id) {
-        return Optional.ofNullable(store.get(id));
+        T val = store.get(id);
+        if (val == null) throw new NotFoundException(id);
+        return Optional.of(val);
     }
 
     @Override
@@ -35,6 +43,8 @@ public class MapRepository<T> implements Repository<T> {
 
     @Override
     public void delete(String id) {
-        store.remove(id);
+        if (store.remove(id) == null) {
+            throw new DeleteException("ID " + id);
+        }
     }
 }

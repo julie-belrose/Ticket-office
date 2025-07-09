@@ -1,7 +1,11 @@
 package org.example.ticketing.domain.exception;
 
-public class CrudException extends RuntimeException {
-
-    public CrudException(String message) { super(message); }
-    public CrudException(String message, Throwable cause) { super(message, cause); }
+/**
+ * Parent for errors raised <em>during CRUD operations</em>
+ * on repositories: <strong>save, find, update, delete</strong>.
+ */
+public abstract class CrudException extends UserMessageException {
+    protected CrudException(String userMessage) {
+        super(userMessage);
+    }
 }
