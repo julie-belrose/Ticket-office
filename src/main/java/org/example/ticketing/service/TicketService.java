@@ -12,8 +12,6 @@ import java.util.UUID;
  *   - enforces capacity rule.
  */
 public class TicketService {
-
-    // ─── FIELDS ───────────────────────────────────
     private final Repository<Event>  eventRepo;
     private final Repository<Client> clientRepo;
 

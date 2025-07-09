@@ -82,7 +82,7 @@ public class Event {
 
     public void addTicket(Ticket ticket) {
         if (!hasAvailableSeats()) {
-            throw new CapacityFullException("Event " + id + " is full");
+            throw new CapacityFullException(id);
         }
         if (!this.equals(ticket.getEvent())) {
             throw new IllegalArgumentException("Ticket does not belong to this event");

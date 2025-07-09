@@ -1,25 +1,60 @@
 package org.example.ticketing.domain.exception;
 
 /**
- * Thrown when an Event has no seats left.
- * Provides a fixed base message and an optional constructor
- * that embeds the event identifier.
+ * Exception levée lorsqu’un {@link org.example.ticketing.domain.Event} a
+ * atteint sa capacité maximale.
+ *
+ * <p>
+ * This class provides a complete personalized message via
+ * {@link #getMessage()},
+ * based on the event identifier concerned.
+ * It inherits from {@link CrudException} for uniform management in the
+ * application.
+ * </p>
+ *
+ * <p>
+ * Example of usage :
+ * </p>
+ * 
+ * <pre>{@code
+ * if (!event.hasAvailableSeats()) {
+ *     throw new CapacityFullException(event.getId());
+ * }
+ * }</pre>
+ *
+ * <p>
+ * And on the display side, in the IHM or a service :
+ * </p>
+ * 
+ * <pre>{@code
+ * catch (CrudException ex) {
+ *     System.out.println(ex.getMessage());
+ * }
+ * }</pre>
  */
 public class CapacityFullException extends CrudException {
 
-    private static final String BASE_MSG = "Event capacity reached";
-
     private final String fullMessage;
 
-    public CapacityFullException() {
-        super(BASE_MSG);
-        this.fullMessage = BASE_MSG + ".";
-    }
-
+    /**
+     * Constructs an exception with a detailed message including the event
+     * identifier.
+     *
+     * @param eventRef the complete event identifier (or name)
+     */
     public CapacityFullException(String eventRef) {
-        super(BASE_MSG);
-        this.fullMessage = BASE_MSG + " for event '" + eventRef + "'.";
+        super("Event capacity reached");
+        this.fullMessage = "Event '" + eventRef + "' is full.";
     }
 
-    public String getFullMessage() { return fullMessage; }
+    /**
+     * Returns the complete message to display to the user.
+     *
+     * @return the complete message describing the error
+     */
+    @Override
+    public String getMessage() {
+        return fullMessage;
+    }
 }
+
